@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diagnóstico Patrimonial — Cristofer Freitas Dutra</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
     --bg: #F7F6F3;
@@ -15,6 +16,7 @@
     --gold: #C9963A;
     --red: #C0392B;
     --green: #16A34A;
+    --orange: #D97706;
     --gray: #6B7280;
     --border: #E5E7EB;
     --shadow: 0 2px 20px rgba(0,0,0,0.06);
@@ -27,7 +29,7 @@
     background: var(--bg);
     color: var(--dark);
     min-height: 100vh;
-    padding: 0 0 80px;
+    padding: 0 0 100px;
   }
 
   .header {
@@ -89,10 +91,7 @@
     color: rgba(255,255,255,0.5);
   }
 
-  .header-meta strong {
-    color: rgba(255,255,255,0.85);
-    font-weight: 500;
-  }
+  .header-meta strong { color: rgba(255,255,255,0.85); font-weight: 500; }
 
   .progress-wrap {
     background: var(--card);
@@ -138,31 +137,22 @@
   .intro-card {
     background: var(--card);
     border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 32px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
     border-left: 4px solid var(--gold);
     box-shadow: var(--shadow);
   }
 
-  .intro-card p {
-    font-size: 15px;
-    line-height: 1.7;
-    color: #374151;
-  }
-
+  .intro-card p { font-size: 15px; line-height: 1.7; color: #374151; }
   .intro-card strong { color: var(--dark); }
 
-  .legend, .legend-item, .legend-dot { display: none; }
-
-  .category {
-    margin-bottom: 32px;
-  }
+  .category { margin-bottom: 28px; }
 
   .category-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     padding: 0 4px;
   }
 
@@ -189,7 +179,6 @@
   .category-subtitle {
     font-size: 12px;
     color: var(--gray);
-    font-weight: 400;
     display: block;
     margin-top: 2px;
   }
@@ -201,7 +190,6 @@
     border: 1.5px solid var(--border);
     transition: all 0.2s ease;
     cursor: pointer;
-    overflow: hidden;
   }
 
   .flag-item:hover {
@@ -211,7 +199,6 @@
   }
 
   .flag-item.checked { border-color: var(--accent-light); background: #EFF6FF; }
-  
 
   .flag-label {
     display: flex;
@@ -221,8 +208,6 @@
     cursor: pointer;
     user-select: none;
   }
-
-.flag-type-dot { display: none; }
 
   .flag-checkbox {
     width: 22px; height: 22px;
@@ -238,8 +223,6 @@
   }
 
   .flag-item.checked .flag-checkbox { background: var(--accent-light); border-color: var(--accent-light); }
-  
-
   .flag-checkbox svg { opacity: 0; transition: opacity 0.2s; }
   .flag-item.checked .flag-checkbox svg { opacity: 1; }
 
@@ -254,43 +237,7 @@
   }
 
   .flag-item.checked .flag-title { color: var(--accent-light); }
-  
-
   .flag-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
-
-.flag-badge { display: none; }
-
-  /* SCOREBOARD */
-  .scoreboard {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 20px 24px;
-    margin-bottom: 32px;
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 16px;
-    border: 1px solid var(--border);
-  }
-
-  .score-item { text-align: center; }
-
-  .score-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 900;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .score-num.positive { color: var(--green); }
-  .score-num.negative { color: var(--red); }
-  .score-num.total { color: var(--accent); }
-
-  .score-label { font-size: 12px; color: var(--gray); font-weight: 500; }
-
-  .score-divider { width: 1px; height: 48px; background: var(--border); }
 
   /* RESULT */
   .result-section { display: none; margin-top: 40px; }
@@ -301,76 +248,179 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .result-card {
+  /* Score card */
+  .score-card {
     border-radius: 20px;
     padding: 36px 28px;
-    margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 16px;
   }
 
-  .result-header {
+  .score-card.low { background: #F0FDF4; color: #166534; }
+  .score-card.medium { background: #FFFBEB; color: #92400E; }
+  .score-card.high { background: #FFF5F5; color: #9B1C1C; }
+  .score-card.critical { background: var(--accent); color: white; }
+
+  .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-total { font-size: 13px; opacity: 0.6; margin-bottom: 16px; }
+
+  .score-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .score-text { font-size: 15px; line-height: 1.7; opacity: 0.85; max-width: 460px; margin: 0 auto; }
+
+  /* Radar */
+  .radar-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .section-sub { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+
+  .radar-canvas-wrap { max-width: 320px; margin: 0 auto 24px; }
+
+  .pilar-bars { display: flex; flex-direction: column; gap: 10px; }
+
+  .pilar-bar-item { }
+
+  .pilar-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .pilar-bar-name { font-size: 13px; font-weight: 500; color: var(--dark); }
+  .pilar-bar-val { font-size: 13px; font-weight: 600; }
+
+  .pilar-bar-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .pilar-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1.2s ease;
+  }
+
+  /* Attention points */
+  .attention-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .attention-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+
+  .attention-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #FFF5F5;
+    border: 1px solid #FECDD3;
+  }
+
+  .attention-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .attention-text { font-size: 14px; color: #7F1D1D; line-height: 1.5; }
+
+  /* Improvement paths */
+  .paths-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .path-item {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .path-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .path-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .path-num {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 24px;
-    margin-bottom: 28px;
-  }
-
-  .result-score-block { text-align: center; }
-
-  .result-score-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 56px;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .result-score-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.6; margin-top: 4px; }
-
-  .result-divider { width: 1px; height: 60px; background: currentColor; opacity: 0.15; }
-
-  .result-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    line-height: 1.3;
-    text-align: center;
-  }
-
-  .result-text {
-    font-size: 15px;
-    line-height: 1.7;
-    opacity: 0.85;
-    text-align: center;
-  }
-
-  .result-breakdown {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 20px;
-  }
-
-  .breakdown-item {
-    padding: 10px 20px;
-    border-radius: 100px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
+    flex-shrink: 0;
   }
 
-  .breakdown-pos { background: rgba(22,163,74,0.15); color: var(--green); }
-  .breakdown-neg { background: rgba(192,57,43,0.15); color: var(--red); }
+  .path-title { font-size: 15px; font-weight: 600; color: var(--dark); line-height: 1.4; }
 
-  .result-low { background: #F0FDF4; color: #166534; }
-  .result-medium { background: #FFFBEB; color: #92400E; }
-  .result-high { background: #FFF5F5; color: #9B1C1C; }
-  .result-critical { background: var(--accent); color: white; }
+  .path-desc { font-size: 14px; color: var(--gray); line-height: 1.6; margin-left: 40px; }
 
+  .path-tip {
+    margin-left: 40px;
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: #EFF6FF;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent-light);
+    font-size: 13px;
+    color: #1e3a8a;
+    line-height: 1.5;
+  }
+
+  /* CTA */
   .cta-card {
     background: var(--dark);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 32px 28px;
     text-align: center;
+    margin-bottom: 16px;
   }
 
   .cta-card h3 {
@@ -394,11 +444,8 @@
     border-radius: 100px;
     text-decoration: none;
     transition: all 0.2s;
-    border: none;
-    cursor: pointer;
     width: 100%;
     max-width: 320px;
-    font-family: 'DM Sans', sans-serif;
   }
 
   .cta-btn:hover {
@@ -410,6 +457,7 @@
   .cta-signature { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.4); }
   .cta-signature strong { color: rgba(255,255,255,0.7); display: block; font-weight: 500; }
 
+  /* Footer */
   .footer-cta {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -424,13 +472,8 @@
     z-index: 200;
   }
 
-  .footer-scores { display: flex; gap: 16px; align-items: center; }
-  .footer-score { text-align: center; }
-  .footer-score-num { font-size: 20px; font-weight: 700; line-height: 1; }
-  .footer-score-num.pos { color: var(--green); }
-  .footer-score-num.neg { color: var(--red); }
-  .footer-score-label { font-size: 11px; color: var(--gray); }
-  .footer-divider { width: 1px; height: 32px; background: var(--border); }
+  .footer-info { font-size: 13px; color: var(--gray); }
+  .footer-info strong { font-size: 20px; font-weight: 700; color: var(--accent); display: block; line-height: 1; }
 
   .footer-btn {
     background: var(--accent);
@@ -455,7 +498,7 @@
 <div class="header">
   <div class="header-tag">Diagnóstico Patrimonial</div>
   <h1>Sua carteira está<br><span>saudável?</span></h1>
-  <p>25 afirmações sobre o seu patrimônio. Marque as que refletem a sua realidade hoje.</p>
+  <p>15 afirmações. 5 minutos. Uma visão clara do que está bem — e onde há oportunidade de melhoria.</p>
   <div class="header-meta">
     <strong>Cristofer Freitas Dutra</strong>
     <span>·</span>
@@ -465,22 +508,19 @@
 
 <div class="progress-wrap">
   <div class="progress-info">
-    <span class="progress-label">Respondidas</span>
-    <span class="progress-count" id="progressCount">0 / 25</span>
+    <span class="progress-label">Marque as que se aplicam a você</span>
+    <span class="progress-count" id="progressCount">0 / 15</span>
   </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
 <div class="main">
 
   <div class="intro-card">
-    <p>Leia cada afirmação e marque as que se aplicam à sua realidade hoje. <strong>Seja honesto — o diagnóstico é para você, não para parecer bem.</strong></p>
-  </div>
+    <p>Leia cada afirmação e marque as que refletem sua realidade hoje. <strong>Seja honesto — o diagnóstico é para você, não para parecer bem.</strong></p>
   </div>
 
-  <!-- CATEGORIA 1 -->
+  <!-- CAT 1: Organização -->
   <div class="category">
     <div class="category-header">
       <div class="category-number">1</div>
@@ -490,58 +530,38 @@
       </div>
     </div>
 
-    <div class="flag-item positive" onclick="toggle(this)">
+    <div class="flag-item" data-cat="0" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
-          <div class="flag-title">Tenho uma visão unificada de todos os meus investimentos, independente de onde estão</div>
-          <div class="flag-desc">Enxergar o patrimônio como um todo é o primeiro passo para gerenciá-lo com estratégia.</div>
+          <div class="flag-title">Tenho investimentos em mais de um banco ou corretora e não tenho uma visão unificada de tudo</div>
+          <div class="flag-desc">Cada extrato separado significa que ninguém — inclusive você — enxerga o patrimônio como um todo.</div>
         </div>
       </label>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="0" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
-          <div class="flag-title">Não sei dizer, de cabeça, qual percentual está em renda fixa, variável e proteção</div>
+          <div class="flag-title">Não sei dizer de cabeça qual percentual está em renda fixa, variável e proteção</div>
           <div class="flag-desc">Se você não sabe a alocação de memória, ela provavelmente não foi planejada.</div>
         </div>
       </label>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="0" data-type="pos" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
-          <div class="flag-title">Tenho produtos que foram indicados pelo banco e nunca questionei por quê</div>
-          <div class="flag-desc">Produto sem justificativa estratégica serve a quem indicou, não a quem comprou.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item positive" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Sei o custo real da minha carteira — taxas de administração, performance e spread</div>
-          <div class="flag-desc">Quem conhece o custo consegue avaliar se o retorno compensa.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Nunca fiz uma revisão formal da carteira com base nos meus objetivos de vida</div>
-          <div class="flag-desc">Carteira que nunca foi revisada foi construída para uma versão sua que talvez não exista mais.</div>
+          <div class="flag-title">Já fiz uma revisão formal da carteira com base nos meus objetivos de vida no último ano</div>
+          <div class="flag-desc">Revisão periódica garante que a estratégia acompanha as mudanças da sua vida.</div>
         </div>
       </label>
     </div>
   </div>
 
-  <!-- CATEGORIA 2 -->
+  <!-- CAT 2: Estratégia -->
   <div class="category">
     <div class="category-header">
       <div class="category-number">2</div>
@@ -551,7 +571,7 @@
       </div>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="1" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -561,7 +581,7 @@
       </label>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="1" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -571,27 +591,7 @@
       </label>
     </div>
 
-    <div class="flag-item positive" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Tenho alguma exposição a ativos internacionais ou dolarizados</div>
-          <div class="flag-desc">Diversificação geográfica protege o patrimônio de riscos específicos do Brasil.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Tomo decisões de investimento com base em notícias, dicas de amigos ou tendências do momento</div>
-          <div class="flag-desc">Decisão reativa sem estratégia quase sempre acontece no momento errado.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item positive" onclick="toggle(this)">
+    <div class="flag-item" data-cat="1" data-type="pos" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -602,7 +602,7 @@
     </div>
   </div>
 
-  <!-- CATEGORIA 3 -->
+  <!-- CAT 3: Risco -->
   <div class="category">
     <div class="category-header">
       <div class="category-number">3</div>
@@ -612,7 +612,7 @@
       </div>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="2" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -622,27 +622,7 @@
       </label>
     </div>
 
-    <div class="flag-item positive" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Tenho clareza sobre quanto do patrimônio posso precisar com liquidez nos próximos 12 meses</div>
-          <div class="flag-desc">Saber a necessidade de liquidez evita vender investimentos de longo prazo no momento errado.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Tenho concentração relevante em um único ativo, setor ou emissor sem intenção estratégica</div>
-          <div class="flag-desc">Concentração sem intenção é risco sem compensação.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="2" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -652,7 +632,7 @@
       </label>
     </div>
 
-    <div class="flag-item positive" onclick="toggle(this)">
+    <div class="flag-item" data-cat="2" data-type="pos" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -663,7 +643,7 @@
     </div>
   </div>
 
-  <!-- CATEGORIA 4 -->
+  <!-- CAT 4: Objetivos -->
   <div class="category">
     <div class="category-header">
       <div class="category-number">4</div>
@@ -673,47 +653,17 @@
       </div>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="3" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
-          <div class="flag-title">Não tenho um número claro de patrimônio necessário para a minha independência financeira</div>
+          <div class="flag-title">Não tenho um número claro de patrimônio necessário para minha independência financeira</div>
           <div class="flag-desc">Sem esse número, qualquer estratégia é genérica. Você está investindo sem saber para onde.</div>
         </div>
       </label>
     </div>
 
-    <div class="flag-item positive" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Cada parte da carteira está associada a um objetivo específico com prazo definido</div>
-          <div class="flag-desc">Dinheiro com propósito claro é dinheiro que trabalha com direção.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Nunca discuti sucessão patrimonial ou como proteger esse patrimônio para quem vier depois</div>
-          <div class="flag-desc">Patrimônio sem planejamento sucessório pode se perder em inventário, impostos e conflitos.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Minha estratégia de investimentos não está integrada com meu planejamento tributário</div>
-          <div class="flag-desc">Tributação não planejada pode consumir parte relevante da rentabilidade que você acha que está tendo.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="3" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -722,19 +672,29 @@
         </div>
       </label>
     </div>
+
+    <div class="flag-item" data-cat="3" data-type="pos" onclick="toggle(this)">
+      <label class="flag-label">
+        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="flag-text">
+          <div class="flag-title">Cada parte da carteira está associada a um objetivo específico com prazo definido</div>
+          <div class="flag-desc">Dinheiro com propósito claro é dinheiro que trabalha com direção.</div>
+        </div>
+      </label>
+    </div>
   </div>
 
-  <!-- CATEGORIA 5 -->
+  <!-- CAT 5: Assessor -->
   <div class="category">
     <div class="category-header">
       <div class="category-number">5</div>
       <div>
-        <div class="category-title">Relacionamento com seu Assessor ou Banco</div>
+        <div class="category-title">Relacionamento com seu Assessor</div>
         <span class="category-subtitle">Quem está realmente do seu lado?</span>
       </div>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="4" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -744,37 +704,17 @@
       </label>
     </div>
 
-    <div class="flag-item negative" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Meu assessor nunca me alertou sobre um risco na carteira antes de eu perceber</div>
-          <div class="flag-desc">Assessor que só age quando você pergunta não está monitorando — está esperando você ligar.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item negative" onclick="toggle(this)">
+    <div class="flag-item" data-cat="4" data-type="neg" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
           <div class="flag-title">Nunca recebi uma explicação clara sobre por que cada produto foi indicado para mim</div>
-          <div class="flag-desc">Indicação sem explicação estratégica é produto sendo vendido, não estratégia sendo construída.</div>
+          <div class="flag-desc">Indicação sem justificativa estratégica é produto sendo vendido, não estratégia sendo construída.</div>
         </div>
       </label>
     </div>
 
-    <div class="flag-item positive" onclick="toggle(this)">
-      <label class="flag-label">
-        <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="flag-text">
-          <div class="flag-title">Me sinto completamente à vontade para questionar as recomendações do meu assessor</div>
-          <div class="flag-desc">Relação de assessoria saudável inclui questionamento e transparência total.</div>
-        </div>
-      </label>
-    </div>
-
-    <div class="flag-item positive" onclick="toggle(this)">
+    <div class="flag-item" data-cat="4" data-type="pos" onclick="toggle(this)">
       <label class="flag-label">
         <div class="flag-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="flag-text">
@@ -785,118 +725,262 @@
     </div>
   </div>
 
-  <!-- RESULT -->
+  <!-- RESULT SECTION -->
   <div class="result-section" id="resultSection">
-    <div class="result-card" id="resultCard">
-      <div class="result-header">
-        <div class="result-score-block">
-          <div class="result-score-num" id="resultNeg" style="color:var(--red)">0</div>
-          <div class="result-score-label">oportunidades</div>
-        </div>
-        <div class="result-divider"></div>
-        <div class="result-score-block">
-          <div class="result-score-num" id="resultPos" style="color:var(--green)">0</div>
-          <div class="result-score-label">pontos fortes</div>
-        </div>
-      </div>
-      <div class="result-title" id="resultTitle"></div>
-      <div class="result-text" id="resultText"></div>
+
+    <!-- Score -->
+    <div class="score-card" id="scoreCard">
+      <div class="score-num" id="scoreNum">0</div>
+      <div class="score-total" id="scoreTotal">de 15 pontos</div>
+      <div class="score-title" id="scoreTitle"></div>
+      <div class="score-text" id="scoreText"></div>
     </div>
 
+    <!-- Radar -->
+    <div class="radar-card">
+      <div class="section-title">Mapa patrimonial</div>
+      <div class="section-sub">Visualize onde estão seus pontos fortes e onde há lacunas</div>
+      <div class="radar-canvas-wrap">
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div class="pilar-bars" id="pilarBars"></div>
+    </div>
+
+    <!-- Attention -->
+    <div class="attention-card" id="attentionCard" style="display:none">
+      <div class="section-title">⚠️ Principais pontos de atenção</div>
+      <div class="section-sub">Áreas que merecem revisão prioritária</div>
+      <div class="attention-list" id="attentionList"></div>
+    </div>
+
+    <!-- Paths -->
+    <div class="paths-card" id="pathsCard" style="display:none">
+      <div class="section-title">🎯 Caminhos de melhoria</div>
+      <div class="section-sub">O que fazer para elevar o nível da sua estratégia patrimonial</div>
+      <div id="pathsList"></div>
+    </div>
+
+    <!-- CTA -->
     <div class="cta-card">
       <h3>Quer entender o tamanho real das oportunidades?</h3>
       <p>Faço um diagnóstico patrimonial completo — sem compromisso. Uma conversa de 30 minutos para mapear onde estão as principais oportunidades de melhoria na sua carteira.</p>
-      <a href="https://wa.me/5548992047040" class="cta-btn">Quero fazer o diagnóstico</a>
+      <a href="https://wa.me/5548992047040" class="cta-btn">Quero fazer o diagnóstico completo</a>
       <div class="cta-signature">
         <strong>Cristofer Freitas Dutra</strong>
         Assessor de Investimentos · Atendo investidores com patrimônio a partir de R$200k
       </div>
     </div>
-  </div>
 
+  </div>
 </div>
 
 <div class="footer-cta">
-  <div class="footer-scores">
-    <div class="footer-score">
-      <div class="footer-score-num" id="footerNeg" style="color:var(--accent)">0</div>
-      <div class="footer-score-label">respondidas</div>
-    </div>
+  <div class="footer-info">
+    <strong id="footerCount">0</strong>
+    respondidas de 15
   </div>
   <button class="footer-btn" id="footerBtn" onclick="showResult()" disabled>
-    Ver diagnóstico
+    Ver meu diagnóstico
   </button>
 </div>
 
 <script>
-  let positives = 0;
-  let negatives = 0;
-  const total = 25;
+  const catData = [
+    { name: "Organização", pos: 0, neg: 0, totalPos: 1, totalNeg: 2,
+      improvements: [
+        { title: "Consolide uma visão única do seu patrimônio", desc: "Liste todos os seus investimentos em um único lugar — banco, corretora, previdência, imóveis. Sem essa visão consolidada, qualquer decisão estratégica é baseada em dados incompletos.", tip: "Uma planilha simples com cada ativo, valor atual e onde está já é um primeiro passo transformador. O objetivo é saber o saldo total e a alocação em menos de 5 minutos." },
+        { title: "Estabeleça uma rotina de revisão periódica", desc: "Carteira que nunca é revisada foi construída para uma versão sua que talvez não exista mais. Uma revisão semestral com base nos seus objetivos atuais é o mínimo.", tip: "Marque no calendário: uma revisão completa a cada 6 meses e um olhar rápido a cada trimestre. Não para reagir ao mercado — para verificar se a estratégia ainda faz sentido." }
+      ]
+    },
+    { name: "Estratégia", pos: 0, neg: 0, totalPos: 1, totalNeg: 2,
+      improvements: [
+        { title: "Identifique e elimine duplicações na carteira", desc: "Ter vários produtos com a mesma estratégia não é diversificação — é concentração disfarcada. Mapear o que cada produto realmente faz é o primeiro passo para uma alocação com lógica.", tip: "Para cada produto da carteira, anote: qual classe de ativo representa? A qual cenário econômico está atrelado? Se dois produtos respondem da mesma forma ao mercado, um deles provavelmente é redundante." },
+        { title: "Inicie uma exposição internacional gradual", desc: "Em 1994, R$1 valia US$1. Hoje vale US$0,17. Patrimônio 100% em reais é patrimônio exposto a um único cenário político, econômico e cambial.", tip: "BDRs e ETFs internacionais já estão disponíveis na sua corretora. Uma alocação inicial de 5% a 10% já muda o perfil de risco da carteira sem exigir conta no exterior." }
+      ]
+    },
+    { name: "Risco", pos: 0, neg: 0, totalPos: 1, totalNeg: 2,
+      improvements: [
+        { title: "Calibre o risco para o que você realmente aguenta", desc: "Perfil de risco no papel e tolerância real à oscilação são coisas diferentes. Se você sentiu vontade de vender na última crise, sua carteira tem mais risco do que você aguenta de verdade.", tip: "A pergunta certa não é 'qual é o meu perfil de risco?' mas 'quanto posso ver minha carteira cair sem entrar em pânico?' A resposta define a alocação correta." },
+        { title: "Adicione proteção contra inflação e câmbio", desc: "Carteira sem proteção pode render bem nominalmente e ainda assim perder poder de compra. IPCA+, ouro, ativos dolarizados e imóveis são classes que protegem em cenários diferentes.", tip: "Uma alocação de 10% a 15% em ativos de proteção — IPCA+, fundos cambiais ou ETFs internacionais — já reduz significativamente a vulnerabilidade da carteira a choques externos." }
+      ]
+    },
+    { name: "Objetivos", pos: 0, neg: 0, totalPos: 1, totalNeg: 2,
+      improvements: [
+        { title: "Defina o número da sua independência financeira", desc: "Sem um número claro, você está investindo sem saber para onde. Independência financeira não é um sonho — é uma meta com valor e prazo específicos.", tip: "Uma regra simples para começar: multiplique o valor que você quer receber por mês por 300. Esse é o patrimônio necessário para viver de renda com segurança. Esse número muda tudo na estratégia." },
+        { title: "Associe cada parte da carteira a um objetivo", desc: "Dinheiro sem propósito é dinheiro sem direção. Cada real investido deveria ter uma função clara: reserva, aposentadoria, imóvel, educação dos filhos, liberdade financeira.", tip: "Divida a carteira em 3 camadas: (1) proteção e liquidez — o que não pode oscilar, (2) crescimento — o que trabalha no longo prazo, (3) objetivos específicos — cada um com prazo e valor definidos." }
+      ]
+    },
+    { name: "Assessoria", pos: 0, neg: 0, totalPos: 1, totalNeg: 2,
+      improvements: [
+        { title: "Entenda como seu assessor é remunerado", desc: "No modelo mais comum no Brasil, assessores ganham comissão por produto indicado. Isso cria um incentivo que nem sempre está alinhado com o seu interesse. Conhecer esse modelo é o primeiro passo para uma relação mais transparente.", tip: "Pergunte diretamente: 'Como você é remunerado quando me indica esse produto?' Um assessor de confiança responde sem hesitar." },
+        { title: "Exija justificativa estratégica para cada indicação", desc: "Cada produto na carteira deveria ter uma razão clara de estar lá — não 'é um bom produto' mas 'faz sentido para o seu objetivo X com prazo Y'.", tip: "Na próxima reunião com seu assessor, pergunte para cada produto: por que esse especificamente? Qual problema ele resolve na minha carteira? Se a resposta for vaga, algo está errado." }
+      ]
+    }
+  ];
+
   let answered = 0;
+  const total = 15;
+  let radarChart = null;
 
   function toggle(el) {
     const wasChecked = el.classList.contains('checked');
-    const isPositive = el.classList.contains('positive');
+    const catIndex = parseInt(el.dataset.cat);
+    const isPos = el.dataset.type === 'pos';
 
     el.classList.toggle('checked');
 
     if (wasChecked) {
       answered--;
-      if (isPositive) positives--;
-      else negatives--;
+      if (isPos) catData[catIndex].pos--;
+      else catData[catIndex].neg--;
     } else {
       answered++;
-      if (isPositive) positives++;
-      else negatives++;
+      if (isPos) catData[catIndex].pos++;
+      else catData[catIndex].neg++;
     }
 
-    updateUI();
-  }
-
-  function updateUI() {
     document.getElementById('progressCount').textContent = answered + ' / ' + total;
     document.getElementById('progressFill').style.width = (answered / total * 100) + '%';
-    document.getElementById('footerNeg').textContent = answered;
+    document.getElementById('footerCount').textContent = answered;
+    document.getElementById('footerBtn').disabled = answered === 0;
+  }
 
-    const btn = document.getElementById('footerBtn');
-    btn.disabled = answered === 0;
+  function getCatScore(cat) {
+    const good = cat.pos + (cat.totalNeg - cat.neg);
+    const max = cat.totalPos + cat.totalNeg;
+    return Math.round((good / max) * 100);
+  }
+
+  function getTotalScore() {
+    const totalGood = catData.reduce((acc, c) => acc + c.pos + (c.totalNeg - c.neg), 0);
+    const totalMax = catData.reduce((acc, c) => acc + c.totalPos + c.totalNeg, 0);
+    return Math.round((totalGood / totalMax) * 15);
+  }
+
+  function getColor(score) {
+    if (score >= 70) return '#16A34A';
+    if (score >= 40) return '#D97706';
+    return '#C0392B';
   }
 
   function showResult() {
     const section = document.getElementById('resultSection');
-    const card = document.getElementById('resultCard');
-    const title = document.getElementById('resultTitle');
-    const text = document.getElementById('resultText');
+    const card = document.getElementById('scoreCard');
 
-    document.getElementById('resultNeg').textContent = negatives;
-    document.getElementById('resultPos').textContent = positives;
+    const score = getTotalScore();
+    document.getElementById('scoreNum').textContent = score;
 
-    card.className = 'result-card';
-
-    const ratio = negatives / (answered || 1);
-
-    if (negatives <= 3) {
-      card.classList.add('result-low');
-      title.textContent = 'Carteira bem estruturada';
-      text.textContent = 'Você demonstra consciência sobre o próprio patrimônio e tem pontos fortes relevantes. Mesmo assim, as oportunidades identificadas merecem atenção — especialmente em tributação e planejamento de longo prazo.';
-    } else if (negatives <= 7) {
-      card.classList.add('result-medium');
-      title.textContent = 'Boa base, com lacunas importantes';
-      text.textContent = 'Você tem ' + positives + ' pontos fortes na carteira — isso é acima da média. Mas as ' + negatives + ' oportunidades identificadas podem estar custando rentabilidade e exposição a riscos que você ainda não mapeou.';
-    } else if (negatives <= 12) {
-      card.classList.add('result-high');
-      title.textContent = 'Carteira com pontos de atenção relevantes';
-      text.textContent = 'O diagnóstico indica que sua carteira foi construída mais por acumulação do que por planejamento. Isso é comum — e tem solução. Os ' + positives + ' pontos fortes mostram que você tem consciência financeira. O próximo passo é estruturar o que ainda não está organizado.';
+    card.className = 'score-card';
+    if (score >= 12) {
+      card.classList.add('low');
+      document.getElementById('scoreTitle').textContent = 'Carteira bem estruturada';
+      document.getElementById('scoreText').textContent = 'Você demonstra consciência sobre o próprio patrimônio. Mesmo assim, sempre há espaço para otimização — especialmente em tributação, proteção e planejamento de longo prazo.';
+    } else if (score >= 8) {
+      card.classList.add('medium');
+      document.getElementById('scoreTitle').textContent = 'Boa base, com lacunas importantes';
+      document.getElementById('scoreText').textContent = 'Você tem uma fundação sólida, mas existem lacunas que podem estar custando rentabilidade perdida e risco não mapeado. Vale uma análise mais detalhada.';
+    } else if (score >= 5) {
+      card.classList.add('high');
+      document.getElementById('scoreTitle').textContent = 'Carteira com pontos de atenção relevantes';
+      document.getElementById('scoreText').textContent = 'O diagnóstico indica que sua carteira foi construída mais por acumulação do que por planejamento. Isso é comum — e tem solução clara.';
     } else {
-      card.classList.add('result-critical');
-      title.textContent = 'Reestruturação necessária';
-      text.textContent = 'Com ' + negatives + ' oportunidades de melhoria identificadas, seu patrimônio está exposto a riscos que você provavelmente ainda não mapeou completamente. Quanto mais cedo você agir, menor o custo da correção.';
+      card.classList.add('critical');
+      document.getElementById('scoreTitle').textContent = 'Reestruturação necessária';
+      document.getElementById('scoreText').textContent = 'Seu patrimônio está exposto a riscos que você provavelmente ainda não mapeou completamente. Quanto mais cedo você agir, menor o custo da correção.';
     }
 
+    buildRadar();
+    buildAttention();
+    buildPaths();
+
     section.classList.add('visible');
-    setTimeout(() => {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+
+  function buildRadar() {
+    const scores = catData.map(c => getCatScore(c));
+    const labels = catData.map(c => c.name);
+    const pointColors = scores.map(s => getColor(s));
+
+    // Pilar bars
+    const barsHtml = catData.map((cat, i) => {
+      const score = scores[i];
+      const color = getColor(score);
+      return `
+        <div class="pilar-bar-item">
+          <div class="pilar-bar-header">
+            <span class="pilar-bar-name">${cat.name}</span>
+            <span class="pilar-bar-val" style="color:${color}">${score}/100</span>
+          </div>
+          <div class="pilar-bar-track">
+            <div class="pilar-bar-fill" style="width:${score}%;background:${color}"></div>
+          </div>
+        </div>`;
+    }).join('');
+    document.getElementById('pilarBars').innerHTML = barsHtml;
+
+    if (radarChart) radarChart.destroy();
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels,
+        datasets: [{
+          data: scores,
+          backgroundColor: 'rgba(26,58,107,0.12)',
+          borderColor: '#1A3A6B',
+          borderWidth: 2,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { stepSize: 25, display: false },
+            grid: { color: 'rgba(0,0,0,0.07)' },
+            pointLabels: { font: { size: 12, family: 'DM Sans' }, color: '#374151' },
+            angleLines: { color: 'rgba(0,0,0,0.07)' }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  function buildAttention() {
+    const weak = catData.filter(c => getCatScore(c) < 60);
+    if (weak.length === 0) return;
+
+    document.getElementById('attentionCard').style.display = 'block';
+    const html = weak.map(c => `
+      <div class="attention-item">
+        <div class="attention-dot"></div>
+        <div class="attention-text"><strong>${c.name}</strong> — pontuação de ${getCatScore(c)}/100. Esta área tem oportunidades relevantes de melhoria.</div>
+      </div>`).join('');
+    document.getElementById('attentionList').innerHTML = html;
+  }
+
+  function buildPaths() {
+    const weak = catData.filter(c => getCatScore(c) < 70);
+    if (weak.length === 0) return;
+
+    document.getElementById('pathsCard').style.display = 'block';
+    let num = 1;
+    const html = weak.flatMap(c => c.improvements.map(imp => `
+      <div class="path-item">
+        <div class="path-header">
+          <div class="path-num">${num++}</div>
+          <div class="path-title">${imp.title}</div>
+        </div>
+        <div class="path-desc">${imp.desc}</div>
+        <div class="path-tip">💡 ${imp.tip}</div>
+      </div>`)).join('');
+    document.getElementById('pathsList').innerHTML = html;
   }
 </script>
 
